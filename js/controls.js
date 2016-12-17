@@ -54,6 +54,8 @@ lissa.controls.oscillator = function($container, title, model, base_freq_knob) {
   var phase_knob = null;
   var sin_knob = null;
   var tri_knob = null;
+  var sqr_knob = null;
+  var saw_knob = null;
 
   var freq_num_knob_settings = {
     label: 'MULTIPLY',
@@ -97,6 +99,20 @@ lissa.controls.oscillator = function($container, title, model, base_freq_knob) {
     max_val: 100,
     default_val: model.getAmp('tri') * 100,
     id: get_id('tri-knob'),
+  };
+  var sqr_knob_settings = {
+    label: 'SQR',
+    min_val: 0,
+    max_val: 100,
+    default_val: model.getAmp('sqr') * 100,
+    id: get_id('sqr-knob'),
+  };
+  var saw_knob_settings = {
+    label: 'SAW',
+    min_val: 0,
+    max_val: 100,
+    default_val: model.getAmp('saw') * 100,
+    id: get_id('saw-knob'),
   };
 
   function setFreq() {
@@ -149,6 +165,14 @@ lissa.controls.oscillator = function($container, title, model, base_freq_knob) {
     tri_knob = lissa.controls.knob($col3,
         wave_amp_setter('tri', tri_knob_settings.max_val), tri_knob_settings);
     tri_knob.render();
+
+    sqr_knob = lissa.controls.knob($col1,
+        wave_amp_setter('sqr', sqr_knob_settings.max_val), sqr_knob_settings);
+    sqr_knob.render();
+
+    saw_knob = lissa.controls.knob($col2,
+        wave_amp_setter('saw', saw_knob_settings.max_val), saw_knob_settings);
+    saw_knob.render();
   }
 
   function randomize() {
@@ -156,11 +180,19 @@ lissa.controls.oscillator = function($container, title, model, base_freq_knob) {
     freq_den_knob.setVal(lissa.utils.random_int(1,5));
     freq_milli_knob.setVal(lissa.utils.random_int(-7,7));
     var sin_amount = lissa.utils.random_int(0,100);
-    sin_knob.setVal(sin_amount);
-    if (lissa.harmonograph_type === 'lateral')
+    var tri_amount = lissa.utils.random_int(0,100);
+    var sqr_amount = lissa.utils.random_int(0,100);
+    var saw_amount = lissa.utils.random_int(0,100);
+    var sum = sin_amount+tri_amount+sqr_amount+saw_amount;
+
+    sin_knob.setVal(sin_amount/sum*100|0);
+    tri_knob.setVal(tri_amount/sum*100|0);
+    sqr_knob.setVal(sqr_amount/sum*100|0);
+    saw_knob.setVal(saw_amount/sum*100|0);
+    /*if (lissa.harmonograph_type === 'lateral')
       tri_knob.setVal(100 - sin_amount);
     else
-      tri_knob.setVal(0);
+      tri_knob.setVal(0);*/
   }
 
   return {
