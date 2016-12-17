@@ -360,7 +360,7 @@ lissa.process = function(buffer) {
   var output_left = buffer.outputBuffer.getChannelData(0);
   var output_right = buffer.outputBuffer.getChannelData(1);
   var size = output_left.length;
-  
+
   if (lissa.active) {
     lissa.synth.setSampleRate(buffer.outputBuffer.sampleRate);
     lissa.synth.process();

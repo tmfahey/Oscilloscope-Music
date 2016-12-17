@@ -133,6 +133,30 @@ h1 {
   padding-left:100px;
 }
 
+.start-button {
+  padding: 5px;
+  background-color: rgb(150, 50, 50);
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  border: 0px;
+  color: #ddd;
+  width: 32%;
+  height: 27px;
+  font-size:16px;
+  font-family: 'myriad-pro-light', trebuchet ms, helvetica, sans;
+  display:inline;
+}
+
+.start-button:hover {
+  background-color: rgb(160, 60, 60);
+}
+
+.start-button:active {
+  background-color: rgb(140, 40, 40);
+}
+
+
 .simple-button {
   padding: 5px;
   background-color: rgb(150, 50, 50);

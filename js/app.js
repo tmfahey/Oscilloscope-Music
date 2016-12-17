@@ -42,6 +42,9 @@ lissa.init = function($) {
 
 (function($){
   $(document).ready(function(){
-    lissa.init($);
+    if(!(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))) {
+      //not mobile, start automatically
+      start();
+    }
   });
 })(jQuery);
