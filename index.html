@@ -1,21 +1,36 @@
-<html>
+
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <title>
-      Lissa Juice
-    </title>
-    <script type="text/javascript">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="img/favicon.ico">
 
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-38450508-1']);
-      _gaq.push(['_trackPageview']);
+    <title>Oscilloscope Music</title>
 
-      (function() {
-       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-       })();
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
 
-    </script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/grid.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
     <script src="js/jquery.min.js"></script>
     <script src="js/jquery.knob.js"></script>
     <script src="js/jquery.minicolors.js"></script>
@@ -27,6 +42,7 @@
     <link rel="stylesheet" type="text/css" href="css/style.css" />
     <link rel="stylesheet" type="text/css" href="css/jquery.minicolors.css" />
   </head>
+
   <body>
     <div class="container">
       <div class="controls">
@@ -66,9 +82,32 @@
           </div>
         </div>
       </div>
-      <canvas id="lissajous"></canvas>
-    </div>
+    
+      <div class="row">
+        <div id="osc-container" class="col-md-7">
+          <canvas id="oscilloscope"></canvas>
+        </div>
+        <div class="col-md-5">
+          <div class="row">
+            <div id="lchannel-container" class="col-md-12">
+              <canvas id="left-channel"></canvas>
+            </div>
+          </div>
+          <div class="row">
+            <div id="rchannel-container" class="col-md-12">
+              <canvas id="right-channel"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
 
+
+
+    </div> <!-- /container -->
+
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="js/ie10-viewport-bug-workaround.js"></script>
     <script type="underscore/template" id="knob">
       <input
         class="knob"

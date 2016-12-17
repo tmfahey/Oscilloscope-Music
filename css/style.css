@@ -1,19 +1,19 @@
 @font-face {
   font-family: 'myriad-pro-light';
-  src: url(../fnt/MyriadPro-Light.otf);
+  src: url(../fonts/MyriadPro-Light.otf);
 }
 @font-face {
   font-family: 'myriad-pro-regular';
-  src: url(../fnt/MyriadPro-Regular.otf);
+  src: url(../fonts/MyriadPro-Regular.otf);
 }
 @font-face {
   font-family: 'myriad-pro-bold';
-  src: url(../fnt/MyriadPro-Bold.otf);
+  src: url(../fonts/MyriadPro-Bold.otf);
 }
 
 body {
-  background-color:#000;
   font-family: 'myriad-pro-light', trebuchet ms, helvetica, sans;
+  background: #000000;
 }
 
 a {
@@ -34,13 +34,6 @@ h1 {
   margin:0;
   bottom:5px;
   right:30px;
-}
-
-#lissajous {
-  position:fixed;
-  left:0;
-  top:0;
-  z-index:-1;
 }
 
 .minicolors {
@@ -115,6 +108,7 @@ h1 {
   position:fixed;
   top:10px;
   left:10px;
+  z-index: 1;
 }
 
 .knobs {
