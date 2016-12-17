@@ -242,13 +242,13 @@ lissa.figure = function() {
     }
 
     // Fadeout drawings a bit
-    osc_context_.globalAlpha = 0.3;
+    osc_context_.globalAlpha = 0.9;
     osc_context_.fillStyle = 'black';
     osc_context_.fillRect(0, 0, osc_width_ + 2 * BORDER, osc_height_ + 2 * BORDER);
-    lchannel_context_.globalAlpha = 0.3;
+    lchannel_context_.globalAlpha = 0.9;
     lchannel_context_.fillStyle = 'black';
     lchannel_context_.fillRect(0, 0, osc_width_ + 2 * BORDER, osc_height_ + 2 * BORDER);
-    rchannel_context_.globalAlpha = 0.3;
+    rchannel_context_.globalAlpha = 0.9;
     rchannel_context_.fillStyle = 'black';
     rchannel_context_.fillRect(0, 0, osc_width_ + 2 * BORDER, osc_height_ + 2 * BORDER);
     var drawing_width = Math.min(osc_width_, osc_height_);
