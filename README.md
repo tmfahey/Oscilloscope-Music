@@ -1,6 +1,7 @@
-lissa
+Oscilloscope Music
 =====
 
-Lissa Juice. A web audio app that visualizes audio and is useful for explaining lissajous figures.
+A web audio app that allows for the manipulation and visualization of audio waveforms. 
+Live Demo: http://fahey.io
 
-Live Demo: http://tytel.org/lissa
+
