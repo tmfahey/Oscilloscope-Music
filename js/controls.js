@@ -181,8 +181,8 @@ lissa.controls.oscillator = function($container, title, model, base_freq_knob) {
     freq_milli_knob.setVal(lissa.utils.random_int(-7,7));
     var sin_amount = lissa.utils.random_int(0,100);
     var tri_amount = lissa.utils.random_int(0,100);
-    var sqr_amount = lissa.utils.random_int(0,100);
-    var saw_amount = lissa.utils.random_int(0,100);
+    var sqr_amount = 0;
+    var saw_amount = 0;
     var sum = sin_amount+tri_amount+sqr_amount+saw_amount;
 
     sin_knob.setVal(sin_amount/sum*100|0);
@@ -316,6 +316,8 @@ lissa.controls.harmonograph_type = function($container, model) {
   }
 
   function randomize() {
+    /*
+    disabling randomizing harmonograph
     var x = Math.random();
     var i = 0;
     if (x < 0.5) {
@@ -326,6 +328,7 @@ lissa.controls.harmonograph_type = function($container, model) {
       i = 2;
     }
     choose($($buttons[i]));
+    */
   }
 
   return {
