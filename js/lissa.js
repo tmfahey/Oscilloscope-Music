@@ -200,7 +200,7 @@ lissa.synth = function() {
 
 lissa.figure = function() {
   var BUFFER_MAX = 4096;
-  var BORDER = 10;
+  var BORDER = 2;
   var COLOR_DECAY = 0.01;
 
   var figure_context_ = null;
@@ -251,7 +251,6 @@ lissa.figure = function() {
     rchannel_context_.globalAlpha = 0.9;
     rchannel_context_.fillStyle = 'black';
     rchannel_context_.fillRect(0, 0, osc_width_ + 2 * BORDER, osc_height_ + 2 * BORDER);
-    var drawing_width = Math.min(osc_width_, osc_height_);
 
     // Prepare to draw.
     osc_context_.globalAlpha = 1;
@@ -268,9 +267,9 @@ lissa.figure = function() {
     // Draw it
     if (lissa.harmonograph_type === 'lateral') {
       for (var i = 1; i < drawpoints.length; i++) {
-        var x = osc_height_ / 2 + drawpoints[i][0][0] * (drawing_width / 2 - BORDER);
+        var x = osc_height_ / 2 + drawpoints[i][0][0] * (osc_height_ / 2 - BORDER);
 
-        var y = osc_width_ / 2 - drawpoints[i][1][0] * (drawing_width / 2 - BORDER);
+        var y = osc_width_ / 2 - drawpoints[i][1][0] * (osc_width_ / 2 - BORDER);
         osc_context_.fillRect(x, y, 1, 5);
       }
     } else { // 'rotary' or 'rotaryinv'
@@ -278,22 +277,11 @@ lissa.figure = function() {
       for (var i = 0; i < drawpoints.length; i++) {
         var osc_x = (drawpoints[i][0][0] + drawpoints[i][1][0]) * 0.5;
         var osc_y = (drawpoints[i][0][1] + sign * drawpoints[i][1][1]) * 0.5;
-        var x = osc_width_ / 2 + osc_x * (drawing_width / 2 - BORDER);
-        var y = osc_height_ / 2 + osc_y * (drawing_width / 2 - BORDER);
+        var x = osc_width_ / 2 + osc_x * (osc_width_ / 2 - BORDER);
+        var y = osc_height_ / 2 + osc_y * (osc_height_ / 2 - BORDER);
         osc_context_.fillRect(x, y, 1, 5);
       }
     }
-    /*
-    for (var i = 0; i < drawpoints.length; i++) {
-      var x = osc_width_ / 2.3 + i;
-      var y = osc_height_ / 4 - drawpoints[i][0][0] * (drawing_width / 2 - BORDER);
-      figure_context_.fillRect(x, y, 1, 5);
-
-      var x = osc_height_ / 2.3 + i;
-      var y = osc_height_ -300.0 - drawpoints[i][1][0] * (drawing_width / 2 - BORDER);
-      figure_context_.fillRect(x, y, 1, 5);
-    }*/
-
     
     var leftCrosspoint = findFirstPositiveZeroCrossing(drawpoints, drawpoints.length, 0)
     var leftDrawpoints = drawpoints.slice(leftCrosspoint, lissa.synth.buffer_size);
@@ -304,13 +292,13 @@ lissa.figure = function() {
     rotate(drawpoints,findFirstPositiveZeroCrossing(drawpoints, drawpoints.length, 0));
     for (var i = 0; i < leftLimit; i++) {
       var x = i;
-      var y = rchannel_height_ / 2 - leftDrawpoints[i][0][0] * (drawing_width / 4 - BORDER);
+      var y = lchannel_height_ / 2 - leftDrawpoints[i][0][0] * (lchannel_height_ / 2 - BORDER);
       lchannel_context_.fillRect(x, y, 1, 5);
     }
     rotate(drawpoints,findFirstPositiveZeroCrossing(drawpoints, drawpoints.length, 1));
     for (var i = 0; i < rightLimit; i++) {
       var x = i;
-      var y = rchannel_height_ /2 - rightDrawpoints[i][1][0] * (drawing_width / 4 - BORDER);
+      var y = rchannel_height_ /2 - rightDrawpoints[i][1][0] * (rchannel_height_ / 2 - BORDER);
       rchannel_context_.fillRect(x, y, 1, 5);
     }
     
