@@ -8,6 +8,7 @@
  */
 
 lissa.BUFFER_SIZE = 1024;
+var synth_processor;
 
 lissa.init = function($) {
   var context = null;
@@ -24,7 +25,7 @@ lissa.init = function($) {
   lissa.figure.init();
   lissa.synth.init(lissa.BUFFER_SIZE);
 
-  var synth_processor = context.createScriptProcessor(lissa.BUFFER_SIZE, 0, 2);
+  synth_processor = context.createScriptProcessor(lissa.BUFFER_SIZE, 0, 2);
   synth_processor.onaudioprocess = lissa.process;
 
   synth_processor.connect(context.destination);
