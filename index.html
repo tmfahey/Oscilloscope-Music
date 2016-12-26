@@ -50,35 +50,38 @@
           <button class="simple-button randomize">
             Randomize
           </button>
-          <button class="simple-button play">
-            Play Song!
-          </button>
           <button class="simple-button controls-toggle">
             Controls
           </button>
+          <button class="simple-button manipulators-toggle">
+            Manipulators
+          </button>
+        </div>
+        <div class="channels">
+          <button class="channel-button ch-1">
+            1
+          </button>
+          <button class="channel-button ch-2">
+            2
+          </button>
+          <button class="channel-button ch-3">
+            3
+          </button>
+          <button class="channel-button ch-4">
+            4
+          </button>
         </div>
         <div class="knobs">
-          <div class="buttons harmonograph-type">
-            <button class="simple-button" data-type="lateral">
-              Lateral
-            </button>
-            <button class="simple-button" data-type="rotary">
-              Rotary
-            </button>
-            <button class="simple-button" data-type="rotaryinv">
-              Rotary Inv.
-            </button>
-          </div>
           <div id="left-oscillator">
           </div>
           <div id="right-oscillator">
           </div>
-          <div class="other-controls">
-            <div id="base_freq">
-            </div>
-          </div>
           <div>
             <input class="minicolors no-textfield" type="text" value="#ffff00">
+          </div>
+        </div>
+        <div class="manipulators">
+          <div id="manipulator">
           </div>
         </div>
       </div>
@@ -115,10 +118,10 @@
         id="<%=id%>"
         data-angleOffset=225
         data-angleArc=270
-        data-bgColor="rgba(34,34,34,0.2)"
-        data-fgColor="rgba(136,136,136,0.4)"
-        data-width="72"
-        data-height="72"
+        data-bgColor="rgba(34,34,34,0.4)"
+        data-fgColor="rgba(136,136,136,0.6)"
+        data-width="45"
+        data-height="45"
         data-min=<%=min_val%>
         data-max=<%=max_val%>
         value="<%=default_val%>">

@@ -11,8 +11,6 @@
 
 var lissa = {};
 
-lissa.harmonograph_type = null; // 'rotary' or 'lateral'
-
 lissa.constants = {};
 
 lissa.smoothValue = function(x, decay_rate) {
@@ -92,6 +90,8 @@ lissa.oscillator = function() {
   var current_phase_ = 0.0;
   var frequency_ = lissa.smoothValue(0.0, FREQ_DECAY);
   var phase_offset_ = lissa.smoothValue(0.0, PHASE_DECAY);
+  var left_channel_ = false;
+  var right_channel_ = false;
 
   function tick() {
     phase_offset = phase_offset_.get();
@@ -101,16 +101,12 @@ lissa.oscillator = function() {
       current_phase_ -= 1.0;
     }
 
-
-    var val1 = 0.0;
-    var val2 = 0.0;
+    var val = 0.0;
     _.each(amps_, function(amp, type) {
-      val1 += amp.tick() * lissa.waveforms[type](current_phase_ + phase_offset);
-      val2 += amp.tick() *
-              lissa.waveforms[type](current_phase_ + phase_offset + 0);
+      val += amp.tick() * lissa.waveforms[type](current_phase_ + phase_offset);
     });
 
-    return [val1, val2];
+    return val;
   }
 
   function setAmp(type, val) {
@@ -133,6 +129,15 @@ lissa.oscillator = function() {
     }
   }
 
+  function setChannels(config){
+    left_channel_ = config[0];
+    right_channel_ = config[1];
+  }
+
+  function getChannels(config){
+    return [left_channel_,right_channel_];
+  }
+
   return {
     tick: tick,
     setFreq: frequency_.set,
@@ -142,6 +147,7 @@ lissa.oscillator = function() {
     getFreq: frequency_.get,
     getPhase: phase_offset_.get,
     getAmp: getAmp,
+    setChannels: setChannels,
   };
 }
 
@@ -160,11 +166,16 @@ lissa.synth = function() {
     this.right.setFreq(DEFAULT_FREQ);
     this.right.setPhase(0.25);
 
+    this.manipulator = lissa.oscillator();
+    this.manipulator.setAmp('sin', 0.7);
+    this.manipulator.setFreq(DEFAULT_FREQ);
+    this.manipulator.setPhase(0.25);
+
     this.buffer_size = buffer_size;
 
     this.output = [];
     for (var i = 0; i < buffer_size; i++)
-      this.output.push([[0.0, 0.0], [0.0, 0.0]]);
+      this.output.push([0.0, 0.0]);
   }
 
   function clip(s) {
@@ -178,12 +189,13 @@ lissa.synth = function() {
   function setSampleRate(sample_rate) {
     this.left.setSampleRate(sample_rate);
     this.right.setSampleRate(sample_rate);
+    this.manipulator.setSampleRate(sample_rate);
   }
 
   function process() {
     for (var i = 0; i < this.buffer_size; ++i) {
-      this.output[i][0] = this.left.tick();
-      this.output[i][1] = this.right.tick();
+      this.output[i][0] = this.left.tick() * this.manipulator.tick();
+      this.output[i][1] = this.right.tick() * this.manipulator.tick();
     }
   }
 
@@ -265,23 +277,13 @@ lissa.figure = function() {
     var drawpoints = points.splice(0, lissa.synth.buffer_size);
 
     // Draw it
-    if (lissa.harmonograph_type === 'lateral') {
-      for (var i = 1; i < drawpoints.length; i++) {
-        var x = osc_height_ / 2 + drawpoints[i][0][0] * (osc_height_ / 2 - BORDER);
+    for (var i = 1; i < drawpoints.length; i++) {
+      var x = osc_height_ / 2 + drawpoints[i][0] * (osc_height_ / 2 - BORDER);
 
-        var y = osc_width_ / 2 - drawpoints[i][1][0] * (osc_width_ / 2 - BORDER);
-        osc_context_.fillRect(x, y, 1, 5);
-      }
-    } else { // 'rotary' or 'rotaryinv'
-      var sign = lissa.harmonograph_type === 'rotary' ? 1 : -1;
-      for (var i = 0; i < drawpoints.length; i++) {
-        var osc_x = (drawpoints[i][0][0] + drawpoints[i][1][0]) * 0.5;
-        var osc_y = (drawpoints[i][0][1] + sign * drawpoints[i][1][1]) * 0.5;
-        var x = osc_width_ / 2 + osc_x * (osc_width_ / 2 - BORDER);
-        var y = osc_height_ / 2 + osc_y * (osc_height_ / 2 - BORDER);
-        osc_context_.fillRect(x, y, 1, 5);
-      }
+      var y = osc_width_ / 2 - drawpoints[i][1] * (osc_width_ / 2 - BORDER);
+      osc_context_.fillRect(x, y, 1, 5);
     }
+
     
     var leftCrosspoint = findFirstPositiveZeroCrossing(drawpoints, drawpoints.length, 0)
     var leftDrawpoints = drawpoints.slice(leftCrosspoint, lissa.synth.buffer_size);
@@ -292,13 +294,13 @@ lissa.figure = function() {
     rotate(drawpoints,findFirstPositiveZeroCrossing(drawpoints, drawpoints.length, 0));
     for (var i = 0; i < leftLimit; i++) {
       var x = i;
-      var y = lchannel_height_ / 2 - leftDrawpoints[i][0][0] * (lchannel_height_ / 2 - BORDER);
+      var y = lchannel_height_ / 2 - leftDrawpoints[i][0] * (lchannel_height_ / 2 - BORDER);
       lchannel_context_.fillRect(x, y, 1, 5);
     }
     rotate(drawpoints,findFirstPositiveZeroCrossing(drawpoints, drawpoints.length, 1));
     for (var i = 0; i < rightLimit; i++) {
       var x = i;
-      var y = rchannel_height_ /2 - rightDrawpoints[i][1][0] * (rchannel_height_ / 2 - BORDER);
+      var y = rchannel_height_ /2 - rightDrawpoints[i][1] * (rchannel_height_ / 2 - BORDER);
       rchannel_context_.fillRect(x, y, 1, 5);
     }
     
@@ -309,10 +311,10 @@ lissa.figure = function() {
     var first_crossing = 0;
     var isNegative = false;
     for(var i = 0; i < buflen; i++){
-      if(!isNegative && buf[i][channel_index][0]<0){
+      if(!isNegative && buf[i][channel_index]<0){
         isNegative = true;
       }
-      if(buf[i][channel_index][0]>0 && isNegative){
+      if(buf[i][channel_index]>0 && isNegative){
         return i;
       }
     }
@@ -354,8 +356,8 @@ lissa.process = function(buffer) {
     lissa.synth.process();
     lissa.figure.process(lissa.synth.output);
     for (var i = 0; i < size; ++i) {
-      output_left[i] = lissa.synth.output[i][0][0];
-      output_right[i] = lissa.synth.output[i][1][0];
+      output_left[i] = lissa.synth.output[i][0];
+      output_right[i] = lissa.synth.output[i][1];
     }
   }
   else {
