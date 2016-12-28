@@ -92,8 +92,12 @@ lissa.oscillator = function() {
   var phase_offset_ = lissa.smoothValue(0.0, PHASE_DECAY);
   var channel_state_ = [false, false];
   var operator_ = '+';
+  var low_cut_ = lissa.smoothValue(0.0);
+  var high_cut_ = lissa.smoothValue(1.0);
 
   function tick() {
+    low_cut = low_cut_.get();
+    high_cut = high_cut_.get();
     phase_offset = phase_offset_.get();
     frequency = frequency_.get();
     current_phase_ += frequency / sample_rate;
@@ -102,9 +106,11 @@ lissa.oscillator = function() {
     }
 
     var val = 0.0;
-    _.each(amps_, function(amp, type) {
-      val += amp.tick() * lissa.waveforms[type](current_phase_ + phase_offset);
-    });
+    if((current_phase_>low_cut) && (current_phase_<high_cut)){
+      _.each(amps_, function(amp, type) {
+        val += amp.tick() * lissa.waveforms[type](current_phase_ + phase_offset);
+      });     
+    }
 
     return val;
   }
@@ -155,9 +161,13 @@ lissa.oscillator = function() {
     setPhase: phase_offset_.set,
     setAmp: setAmp,
     setSampleRate: setSampleRate,
+    setLowCut: low_cut_.set,
+    setHighCut: high_cut_.set,
     getFreq: frequency_.get,
     getPhase: phase_offset_.get,
     getAmp: getAmp,
+    getLowCut: low_cut_.get,
+    getHighCut: high_cut_.get,
     setChannels: setChannels,
     getChannels: getChannels,
     isEnabled: isEnabled,

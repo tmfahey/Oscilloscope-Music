@@ -58,6 +58,8 @@ lissa.controls.oscillator = function($container, oscillators) {
   var sqr_knob = null;
   var saw_knob = null;
   var freq_knob = null;
+  var lowcut_knob = null;
+  var highcut_knob = null;
 
   var multiply_knob_settings = {
     label: 'MULTIPLY',
@@ -115,14 +117,21 @@ lissa.controls.oscillator = function($container, oscillators) {
     max_val: 100,
     default_val: selected_oscillator_.getAmp('saw') * 100,
     id: get_id('saw-knob'),
-  };/*
-  var low_cut_knob_settings = {
-    label: 'SAW',
+  };
+  var lowcut_knob_settings = {
+    label: 'LOW CUT',
     min_val: 0,
     max_val: 100,
-    default_val: selected_oscillator_.getAmp('low') * 100,
-    id: get_id('saw-knob'),
-  };*/
+    default_val: 0,
+    id: get_id('lowcut-knob'),
+  };
+  var highcut_knob_settings = {
+    label: 'HIGH CUT',
+    min_val: 0,
+    max_val: 100,
+    default_val: 100,
+    id: get_id('highcut-knob'),
+  };
   var freq_knob_settings = {
     label: 'FREQ',
     min_val: 1,
@@ -193,6 +202,18 @@ lissa.controls.oscillator = function($container, oscillators) {
 
     freq_knob = lissa.controls.knob($col3, setFreq, freq_knob_settings);
     freq_knob.render();
+
+    lowcut_knob = lissa.controls.knob($col1,
+      function(val) {
+        selected_oscillator_.setLowCut(val / 100);
+      }, lowcut_knob_settings);
+    lowcut_knob.render();
+
+    highcut_knob = lissa.controls.knob($col2,
+      function(val) {
+        selected_oscillator_.setHighCut(val / 100);
+      }, highcut_knob_settings);
+    highcut_knob.render();
   }
 
   function onOscillatorChange(event){
