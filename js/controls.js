@@ -115,7 +115,14 @@ lissa.controls.oscillator = function($container, oscillators) {
     max_val: 100,
     default_val: selected_oscillator_.getAmp('saw') * 100,
     id: get_id('saw-knob'),
-  };
+  };/*
+  var low_cut_knob_settings = {
+    label: 'SAW',
+    min_val: 0,
+    max_val: 100,
+    default_val: selected_oscillator_.getAmp('low') * 100,
+    id: get_id('saw-knob'),
+  };*/
   var freq_knob_settings = {
     label: 'FREQ',
     min_val: 1,
@@ -138,8 +145,9 @@ lissa.controls.oscillator = function($container, oscillators) {
   }
 
   function render() {
-    var $el = lissa.templates.templates.oscillator({title: 'Channel ' + 1});
+    var $el = lissa.templates.templates.oscillator();
     $container.append($el);
+    updateOscillator(1);
 
     var $col1 = $container.find('.knob-column.col-1').first();
     var $col2 = $container.find('.knob-column.col-2').first();
@@ -187,15 +195,49 @@ lissa.controls.oscillator = function($container, oscillators) {
     freq_knob.render();
   }
 
-  function onChannelChange(event){
-      switchChannel(event.data);
+  function onOscillatorChange(event){
+    updateOscillator(event.data.oscillator);
   }
 
-  function switchChannel(channel){
-      var $title = $container.find('.oscillator-title').first();
-      $title.text('Channel ' + channel);
-      selected_ = event.data;
-      selected_oscillator_ = oscillators_[selected_-1];
+  function onChannelChange(event){
+    var channel_state = selected_oscillator_.getChannels();
+    if(event.data.channel == 'left'){
+      channel_state[0] = !channel_state[0];
+    }else if(event.data.channel == 'right'){
+      channel_state[1] = !channel_state[1];
+    }
+    updateChannel(channel_state);
+  }
+
+  function onOperationChange(event){
+    updateOperation(event.data.operation);
+  }
+
+  function updateOperation(operation){
+    selected_oscillator_.setOperator(operation);
+    updateTitle();
+  }
+
+  function updateChannel(channel_state){
+    selected_oscillator_.setChannels(channel_state);
+    updateTitle();
+  }
+
+  function updateOscillator(oscillator){
+    selected_ = oscillator;
+    selected_oscillator_ = oscillators_[selected_-1];
+    updateTitle();
+  }
+
+  function updateTitle(){
+    var $title = $container.find('.oscillator-title').first();
+    var channel_state = selected_oscillator_.getChannels();
+    var channel_string = (channel_state[0]&&channel_state[1]) ? 'Both' :
+      channel_state[0] ? 'L' : 
+      channel_state[1] ? 'R' :
+      'Disabled';
+    $title.text('Channel ' + selected_ + ' ' + 
+      selected_oscillator_.getOperator() + ' ' + channel_string);
   }
 
   function randomize() {
@@ -220,7 +262,9 @@ lissa.controls.oscillator = function($container, oscillators) {
     render: render,
     randomize: randomize,
     setFreq: setFreq,
-    onChannelChange: onChannelChange
+    onChannelChange: onChannelChange,
+    onOperationChange: onOperationChange,
+    onOscillatorChange: onOscillatorChange
   };
 };
 
@@ -322,15 +366,26 @@ lissa.controls.init = function($container) {
   );
   oscillator_controls.render();
 
-  var $ch1_button = $container.find('.ch-1').first();
-  var $ch2_button = $container.find('.ch-2').first();
-  var $ch3_button = $container.find('.ch-3').first();
-  var $ch4_button = $container.find('.ch-4').first();
+  var $plus_button = $container.find('.op-plus').first();
+  var $subtract_button = $container.find('.op-subtract').first();
+  var $multiply_button = $container.find('.op-multiply').first();
+  var $divide_button = $container.find('.op-divide').first();
+  
+  $plus_button.on('click', {operation: '+'}, oscillator_controls.onOperationChange);
+  $subtract_button.on('click', {operation: '-'}, oscillator_controls.onOperationChange);
+  $multiply_button.on('click', {operation: '*'}, oscillator_controls.onOperationChange);
+  $divide_button.on('click', {operation: '/'}, oscillator_controls.onOperationChange);
 
-  $ch1_button.on('click', 1, oscillator_controls.onChannelChange);
-  $ch2_button.on('click', 2, oscillator_controls.onChannelChange);
-  $ch3_button.on('click', 3, oscillator_controls.onChannelChange);
-  $ch4_button.on('click', 4, oscillator_controls.onChannelChange);
+  var $ch_left_button = $container.find('.ch-left').first();
+  var $ch_right_button = $container.find('.ch-right').first();
+
+  $ch_left_button.on('click', {channel: 'left'}, oscillator_controls.onChannelChange);
+  $ch_right_button.on('click', {channel: 'right'}, oscillator_controls.onChannelChange);
+
+  for(var i=1; i<5; i++){
+    $container.find('.osc-'+i).first().on('click', {oscillator: i}, 
+      oscillator_controls.onOscillatorChange);
+  }
 
   //TODO make minicolors scoped within the container somehow
   //or take its location as an input

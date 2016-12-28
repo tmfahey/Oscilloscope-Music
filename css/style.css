@@ -180,6 +180,58 @@ h1 {
   background-color: rgb(140, 40, 40);
 }
 
+.osc-button {
+  padding: 5px;
+  background-color: rgb(150, 50, 50);
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  border: 0px;
+  margin-right:2%;
+  margin-bottom:5px;
+  color: #ddd;
+  width: 23%;
+  height: 27px;
+  font-size:16px;
+  font-family: 'myriad-pro-light', trebuchet ms, helvetica, sans;
+  display:inline;
+  float:left;
+}
+
+.osc-button:hover {
+  background-color: rgb(160, 60, 60);
+}
+
+.osc-button:active {
+  background-color: rgb(140, 40, 40);
+}
+
+.operator-button {
+  padding: 5px;
+  background-color: rgb(150, 50, 50);
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  border: 0px;
+  margin-right:2%;
+  margin-bottom:5px;
+  color: #ddd;
+  width: 23%;
+  height: 27px;
+  font-size:16px;
+  font-family: 'myriad-pro-light', trebuchet ms, helvetica, sans;
+  display:inline;
+  float:left;
+}
+
+.operator-button:hover {
+  background-color: rgb(160, 60, 60);
+}
+
+.operator-button:active {
+  background-color: rgb(140, 40, 40);
+}
+
 .channel-button {
   padding: 5px;
   background-color: rgb(150, 50, 50);

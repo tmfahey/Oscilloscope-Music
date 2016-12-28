@@ -90,8 +90,7 @@ lissa.oscillator = function() {
   var current_phase_ = 0.0;
   var frequency_ = lissa.smoothValue(0.0, FREQ_DECAY);
   var phase_offset_ = lissa.smoothValue(0.0, PHASE_DECAY);
-  var left_channel_ = false;
-  var right_channel_ = false;
+  var channel_state_ = [false, false];
   var operator_ = '+';
 
   function tick() {
@@ -130,24 +129,23 @@ lissa.oscillator = function() {
     }
   }
 
-  function setChannels(config){
-    left_channel_ = config[0];
-    right_channel_ = config[1];
+  function setChannels(channel_state){
+    channel_state_ = channel_state;
   }
 
-  function getChannels(config){
-    return [left_channel_,right_channel_];
+  function getChannels(){
+    return channel_state_;
   }
 
   function isEnabled(){
-    return left_channel_ || right_channel_;
+    return channel_state_[0] || channel_state_[1];
   }
 
   function setOperator(operator){
     operator_ = operator;
   }
 
-  function getOperator(operator){
+  function getOperator(){
     return operator_;
   }
 
