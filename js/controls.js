@@ -43,8 +43,11 @@ lissa.controls.knob = function($container, f, settings) {
   };
 };
 
-lissa.controls.oscillator = function($container, title, model) {
+lissa.controls.oscillator = function($container, oscillators) {
   // model is a lissa.oscillator()
+  var oscillators_ = oscillators;
+  var selected_ = 0;
+  var selected_oscillator_ = oscillators[selected_];
 
   var multiply_knob = null;
   var divide_knob = null;
@@ -81,7 +84,7 @@ lissa.controls.oscillator = function($container, title, model) {
     label: 'PHASE',
     min_val: -180,
     max_val: 180,
-    default_val: model.getPhase() * 360,
+    default_val: selected_oscillator_.getPhase() * 360,
     id: get_id('phase-knob'),
   };
 
@@ -89,28 +92,28 @@ lissa.controls.oscillator = function($container, title, model) {
     label: 'SIN',
     min_val: 0,
     max_val: 100,
-    default_val: model.getAmp('sin') * 100,
+    default_val: selected_oscillator_.getAmp('sin') * 100,
     id: get_id('sin-knob'),
   };
   var tri_knob_settings = {
     label: 'TRI',
     min_val: 0,
     max_val: 100,
-    default_val: model.getAmp('tri') * 100,
+    default_val: selected_oscillator_.getAmp('tri') * 100,
     id: get_id('tri-knob'),
   };
   var sqr_knob_settings = {
     label: 'SQR',
     min_val: 0,
     max_val: 100,
-    default_val: model.getAmp('sqr') * 100,
+    default_val: selected_oscillator_.getAmp('sqr') * 100,
     id: get_id('sqr-knob'),
   };
   var saw_knob_settings = {
     label: 'SAW',
     min_val: 0,
     max_val: 100,
-    default_val: model.getAmp('saw') * 100,
+    default_val: selected_oscillator_.getAmp('saw') * 100,
     id: get_id('saw-knob'),
   };
   var freq_knob_settings = {
@@ -125,7 +128,7 @@ lissa.controls.oscillator = function($container, title, model) {
     // setTimeout makes sure all knobs have updated before reading their value
     setTimeout(function() {
       var freq = freq_knob.getVal() * (1.0 * multiply_knob.getVal() / divide_knob.getVal()) * Math.pow(2, detune_knob.getVal() / 12000.0);
-      model.setFreq(freq);
+      selected_oscillator_.setFreq(freq);
     }, 0);
   }
 
@@ -135,7 +138,7 @@ lissa.controls.oscillator = function($container, title, model) {
   }
 
   function render() {
-    var $el = lissa.templates.templates.oscillator({title: title});
+    var $el = lissa.templates.templates.oscillator({title: 'Channel ' + 1});
     $container.append($el);
 
     var $col1 = $container.find('.knob-column.col-1').first();
@@ -153,14 +156,14 @@ lissa.controls.oscillator = function($container, title, model) {
 
     phase_knob = lissa.controls.knob($col2,
       function(val) {
-        model.setPhase(val / 360);
+        selected_oscillator_.setPhase(val / 360);
       }, 
       phase_knob_settings);
     phase_knob.render();
 
     function wave_amp_setter(type, max) {
       return function(val) {
-        model.setAmp(type, val / max);
+        selected_oscillator_.setAmp(type, val / max);
       };
     }
 
@@ -182,6 +185,17 @@ lissa.controls.oscillator = function($container, title, model) {
 
     freq_knob = lissa.controls.knob($col3, setFreq, freq_knob_settings);
     freq_knob.render();
+  }
+
+  function onChannelChange(event){
+      switchChannel(event.data);
+  }
+
+  function switchChannel(channel){
+      var $title = $container.find('.oscillator-title').first();
+      $title.text('Channel ' + channel);
+      selected_ = event.data;
+      selected_oscillator_ = oscillators_[selected_-1];
   }
 
   function randomize() {
@@ -206,6 +220,7 @@ lissa.controls.oscillator = function($container, title, model) {
     render: render,
     randomize: randomize,
     setFreq: setFreq,
+    onChannelChange: onChannelChange
   };
 };
 
@@ -253,7 +268,8 @@ lissa.controls.randomizer = function($container, items) {
   var manipulators_shown = false;
   var controls_shown = false;
 
-
+  if (!controls_shown)
+    $('.controls').hide();
 
   if (!manipulators_shown)
     $('.manipulators').hide();
@@ -300,34 +316,28 @@ lissa.controls.randomizer = function($container, items) {
 };
 
 lissa.controls.init = function($container) {
-  var left_oscillator_control = lissa.controls.oscillator(
-    $container.find('#left-oscillator').first(),
-    'Left Oscillator - X',
-    lissa.synth.left
+  var oscillator_controls = lissa.controls.oscillator(
+    $container.find('#oscillator-controls').first(),
+    lissa.synth.oscillators
   );
-  left_oscillator_control.render();
+  oscillator_controls.render();
 
-  var right_oscillator_control = lissa.controls.oscillator(
-    $container.find('#right-oscillator').first(),
-    'Right Oscillator - Y',
-    lissa.synth.right
-  );
-  right_oscillator_control.render();
+  var $ch1_button = $container.find('.ch-1').first();
+  var $ch2_button = $container.find('.ch-2').first();
+  var $ch3_button = $container.find('.ch-3').first();
+  var $ch4_button = $container.find('.ch-4').first();
 
-  var manipulator_oscillator_control = lissa.controls.oscillator(
-    $container.find('#manipulator').first(),
-    'Manipulator Oscillator',
-    lissa.synth.manipulator
-  );
-  manipulator_oscillator_control.render();
+  $ch1_button.on('click', 1, oscillator_controls.onChannelChange);
+  $ch2_button.on('click', 2, oscillator_controls.onChannelChange);
+  $ch3_button.on('click', 3, oscillator_controls.onChannelChange);
+  $ch4_button.on('click', 4, oscillator_controls.onChannelChange);
 
   //TODO make minicolors scoped within the container somehow
   //or take its location as an input
   var minicolors = lissa.controls.minicolors($('.minicolors'));
   minicolors.init();
 
-  var randomizer = lissa.controls.randomizer($container, [right_oscillator_control,
-    left_oscillator_control, manipulator_oscillator_control, minicolors]);
+  var randomizer = lissa.controls.randomizer($container, [oscillator_controls, minicolors]);
   randomizer.init();
 };
 

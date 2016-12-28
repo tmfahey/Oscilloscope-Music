@@ -92,6 +92,7 @@ lissa.oscillator = function() {
   var phase_offset_ = lissa.smoothValue(0.0, PHASE_DECAY);
   var left_channel_ = false;
   var right_channel_ = false;
+  var operator_ = '+';
 
   function tick() {
     phase_offset = phase_offset_.get();
@@ -138,6 +139,18 @@ lissa.oscillator = function() {
     return [left_channel_,right_channel_];
   }
 
+  function isEnabled(){
+    return left_channel_ || right_channel_;
+  }
+
+  function setOperator(operator){
+    operator_ = operator;
+  }
+
+  function getOperator(operator){
+    return operator_;
+  }
+
   return {
     tick: tick,
     setFreq: frequency_.set,
@@ -148,28 +161,42 @@ lissa.oscillator = function() {
     getPhase: phase_offset_.get,
     getAmp: getAmp,
     setChannels: setChannels,
+    getChannels: getChannels,
+    isEnabled: isEnabled,
+    setOperator: setOperator,
+    getOperator: getOperator,
   };
 }
 
 
 lissa.synth = function() {
   var DEFAULT_FREQ = 200.0;
+  var OSCILLATOR_COUNT = 4;
+  var oscillators_ = [];
+  var operators = {
+    '+': function(a, b) { return a + b },
+    '-': function(a, b) { return a - b },
+    '/': function(a, b) { return a / b },
+    '*': function(a, b) { return a * b }
+  };
 
   function init(buffer_size) {
-    this.left = lissa.oscillator();
-    this.left.setAmp('sin', 0.7);
-    this.left.setFreq(DEFAULT_FREQ);
-    this.left.setPhase(0.0);
+    //create 4 oscillators
+    for(var i=0; i<OSCILLATOR_COUNT; i++){
+      var osc = lissa.oscillator();
+      osc.setFreq(DEFAULT_FREQ);
+      osc.setOperator('+');
+      osc.setChannels([false,false]);
+      oscillators_.push(osc);
+    }
+    oscillators_[0].setAmp('sin', 0.7);
+    oscillators_[0].setChannels([true,false]);
+    oscillators_[0].setPhase(0.0);
+    oscillators_[1].setAmp('sin', 0.7);
+    oscillators_[1].setChannels([false,true]);
+    oscillators_[1].setPhase(0.25);
 
-    this.right = lissa.oscillator();
-    this.right.setAmp('sin', 0.7);
-    this.right.setFreq(DEFAULT_FREQ);
-    this.right.setPhase(0.25);
-
-    this.manipulator = lissa.oscillator();
-    this.manipulator.setAmp('sin', 0.7);
-    this.manipulator.setFreq(DEFAULT_FREQ);
-    this.manipulator.setPhase(0.25);
+    this.oscillators = oscillators_;
 
     this.buffer_size = buffer_size;
 
@@ -187,15 +214,28 @@ lissa.synth = function() {
   }
 
   function setSampleRate(sample_rate) {
-    this.left.setSampleRate(sample_rate);
-    this.right.setSampleRate(sample_rate);
-    this.manipulator.setSampleRate(sample_rate);
+    _.each(oscillators_, function(osc){
+      osc.setSampleRate(sample_rate);   
+    });
   }
 
   function process() {
     for (var i = 0; i < this.buffer_size; ++i) {
-      this.output[i][0] = this.left.tick() * this.manipulator.tick();
-      this.output[i][1] = this.right.tick() * this.manipulator.tick();
+      var left_value_ = 0;
+      var right_value_ = 0;
+      _.each(oscillators_, function(osc){
+        if(osc.isEnabled()){
+          var osc_channel_config_ = osc.getChannels();
+          if(osc_channel_config_[0]){
+            left_value_ = operators[osc.getOperator()](left_value_, osc.tick());
+          }
+          if(osc_channel_config_[1]){
+            right_value_ = operators[osc.getOperator()](right_value_, osc.tick());
+          } 
+        }
+      });
+      this.output[i][0] = left_value_;
+      this.output[i][1] = right_value_;
     }
   }
 
@@ -204,8 +244,7 @@ lissa.synth = function() {
     process: process,
     setSampleRate: setSampleRate,
     buffer_size: 0,
-    left: null,
-    right: null,
+    oscillators: null,
     output: null,
   };
 }();
