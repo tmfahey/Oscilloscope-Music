@@ -45,63 +45,71 @@
 
   <body>
     <div class="container">
-      <div class="controls" id="controls">
+      
+      <div class="controls-container">
         <div class="buttons">
-          <button class="simple-button randomize">
-            Randomize
-          </button>
           <button class="simple-button controls-toggle">
             Controls
           </button>
-          <button class="simple-button manipulators-toggle">
-            Manipulators
-          </button>
+          <!-- randomize requires new implementation
+          <button class="simple-button randomize">
+            Randomize
+          </button>-->
         </div>
-        <div class="oscillators">
-          <button class="osc-button osc-1">
-            1
-          </button>
-          <button class="osc-button osc-2">
-            2
-          </button>
-          <button class="osc-button osc-3">
-            3
-          </button>
-          <button class="osc-button osc-4">
-            4
-          </button>
+        <div>
+          <input class="minicolors no-textfield" type="text" value="#ffff00">
         </div>
-        <div class="operators">
-          <button class="operator-button op-plus">
-            +
-          </button>
-          <button class="operator-button op-subtract">
-            -
-          </button>
-          <button class="operator-button op-multiply">
-            *
-          </button>
-          <button class="operator-button op-divide">
-            /
-          </button>
-        </div>
-        <div class="channels">
-          <button class="channel-button ch-left">
-            Left
-          </button>
-          <button class="channel-button ch-right">
-            Right
-          </button>
-        </div>
-        <div class="knobs">
-          <div id="oscillator-controls">
+        <div class="controls">
+          <div class="oscillators">
+            <button class="osc-button osc-1">
+              1
+            </button>
+            <button class="osc-button osc-2">
+              2
+            </button>
+            <button class="osc-button osc-3">
+              3
+            </button>
+            <button class="osc-button osc-4">
+              4
+            </button>
+            <button class="osc-button osc-5">
+              5
+            </button>
+            <button class="osc-button osc-6">
+              6
+            </button>
+            <button class="osc-button osc-7">
+              7
+            </button>
+            <button class="osc-button osc-8">
+              8
+            </button>
           </div>
-          <div>
-            <input class="minicolors no-textfield" type="text" value="#ffff00">
+          <div class="operators">
+            <button class="operator-button op-plus">
+              +
+            </button>
+            <button class="operator-button op-subtract">
+              -
+            </button>
+            <button class="operator-button op-multiply">
+              *
+            </button>
+            <button class="operator-button op-divide">
+              /
+            </button>
           </div>
-        </div>
-        <div class="manipulators">
-          <div id="manipulator">
+          <div class="channels">
+            <button class="channel-button ch-left">
+              Left
+            </button>
+            <button class="channel-button ch-right">
+              Right
+            </button>
+          </div>
+          <div class="knobs">
+            <div id="oscillator-controls"> </div>
           </div>
         </div>
       </div>
@@ -140,8 +148,8 @@
         data-angleArc=270
         data-bgColor="rgba(34,34,34,0.4)"
         data-fgColor="rgba(136,136,136,0.6)"
-        data-width="45"
-        data-height="45"
+        data-width="60"
+        data-height="60"
         data-min=<%=min_val%>
         data-max=<%=max_val%>
         value="<%=default_val%>">

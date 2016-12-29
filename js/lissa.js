@@ -94,10 +94,14 @@ lissa.oscillator = function() {
   var operator_ = '+';
   var low_cut_ = lissa.smoothValue(0.0);
   var high_cut_ = lissa.smoothValue(1.0);
+  var offset_cut_ = lissa.smoothValue(0.0);
+  var offset_ = lissa.smoothValue(0.0);
 
   function tick() {
     low_cut = low_cut_.get();
     high_cut = high_cut_.get();
+    offset_cut = offset_cut_.get();
+    offset = offset_.get();
     phase_offset = phase_offset_.get();
     frequency = frequency_.get();
     current_phase_ += frequency / sample_rate;
@@ -105,11 +109,13 @@ lissa.oscillator = function() {
       current_phase_ -= 1.0;
     }
 
-    var val = 0.0;
+    var val = offset;
     if((current_phase_>low_cut) && (current_phase_<high_cut)){
       _.each(amps_, function(amp, type) {
         val += amp.tick() * lissa.waveforms[type](current_phase_ + phase_offset);
       });     
+    }else{
+      val = offset_cut;
     }
 
     return val;
@@ -163,23 +169,27 @@ lissa.oscillator = function() {
     setSampleRate: setSampleRate,
     setLowCut: low_cut_.set,
     setHighCut: high_cut_.set,
+    setOffsetCut: offset_cut_.set,
+    setOffset: offset_.set,
+    setChannels: setChannels,
+    setOperator: setOperator,
     getFreq: frequency_.get,
     getPhase: phase_offset_.get,
     getAmp: getAmp,
     getLowCut: low_cut_.get,
     getHighCut: high_cut_.get,
-    setChannels: setChannels,
+    getOffsetCut: offset_cut_.get,
+    getOffset: offset_.get,
     getChannels: getChannels,
-    isEnabled: isEnabled,
-    setOperator: setOperator,
     getOperator: getOperator,
+    isEnabled: isEnabled,
   };
 }
 
 
 lissa.synth = function() {
   var DEFAULT_FREQ = 200.0;
-  var OSCILLATOR_COUNT = 4;
+  var OSCILLATOR_COUNT = 8;
   var oscillators_ = [];
   var operators = {
     '+': function(a, b) { return a + b },
@@ -232,15 +242,14 @@ lissa.synth = function() {
       var left_value_ = 0;
       var right_value_ = 0;
       _.each(oscillators_, function(osc){
-        if(osc.isEnabled()){
-          var osc_channel_config_ = osc.getChannels();
-          if(osc_channel_config_[0]){
-            left_value_ = operators[osc.getOperator()](left_value_, osc.tick());
-          }
-          if(osc_channel_config_[1]){
-            right_value_ = operators[osc.getOperator()](right_value_, osc.tick());
-          } 
+        var osc_channel_config_ = osc.getChannels();
+        var tick = osc.tick();
+        if(osc_channel_config_[0]){
+          left_value_ = operators[osc.getOperator()](left_value_, tick);
         }
+        if(osc_channel_config_[1]){
+          right_value_ = operators[osc.getOperator()](right_value_, tick);
+        } 
       });
       this.output[i][0] = left_value_;
       this.output[i][1] = right_value_;

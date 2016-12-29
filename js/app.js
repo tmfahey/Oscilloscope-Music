@@ -31,7 +31,7 @@ lissa.init = function($) {
   synth_processor.connect(context.destination);
   lissa.figure.draw();
 
-  lissa.controls.init($('.controls'));
+  lissa.controls.init($('.controls-container'));
 
   $(window).focus(function() { lissa.active = true; });
   $(window).blur(function() { lissa.active = false; });
