@@ -1,1 +1,4 @@
 *.DS_Store
+
+osc_music.sublime-project
+*.sublime-workspace
