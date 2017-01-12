@@ -45,8 +45,26 @@
 
   <body>
     <div class="container">
+      <div class="row">
+        <div id="osc-container" class="col-md-7">
+          <button class="start-button" id="start_button">Start</button>
+          <canvas id="oscilloscope"></canvas>
+        </div>
+        <div class="col-md-5">
+          <div class="row">
+            <div id="lchannel-container" class="col-md-12">
+              <canvas id="left-channel"></canvas>
+            </div>
+          </div>
+          <div class="row">
+            <div id="rchannel-container" class="col-md-12">
+              <canvas id="right-channel"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
       
-      <div class="controls-container">
+      <div class="controls-container" id="controls_container">
         <div class="buttons">
           <button class="simple-button controls-toggle">
             Controls
@@ -114,24 +132,6 @@
         </div>
       </div>
     
-      <div class="row">
-        <div id="osc-container" class="col-md-7">
-          <button class="start-button" id="start_button">Start</button>
-          <canvas id="oscilloscope"></canvas>
-        </div>
-        <div class="col-md-5">
-          <div class="row">
-            <div id="lchannel-container" class="col-md-12">
-              <canvas id="left-channel"></canvas>
-            </div>
-          </div>
-          <div class="row">
-            <div id="rchannel-container" class="col-md-12">
-              <canvas id="right-channel"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
 
 
 
@@ -172,12 +172,12 @@
     <script type="text/javascript">
       var button = document.getElementById('start_button');
       button.addEventListener('click',start,false);
-      document.getElementById('controls').style.display = 'none';
+      document.getElementById('controls_container').style.display = 'none';
 
       function start() {
           lissa.init($);
           document.getElementById('start_button').style.display = 'none';
-          document.getElementById('controls').style.display = 'block';
+          document.getElementById('controls_container').style.display = 'block';
       }   
   </script>
   </body>

@@ -60,7 +60,6 @@ lissa.controls.oscillator = function($container, oscillators) {
   var freq_knob = null;
   var lowcut_knob = null;
   var highcut_knob = null;
-  var offsetcut_knob = null;
   var offset_knob = null;
 
   var multiply_knob_settings = {
@@ -91,7 +90,6 @@ lissa.controls.oscillator = function($container, oscillators) {
     default_val: selected_oscillator_.getPhase() * 360,
     id: get_id('phase-knob'),
   };
-
   var sin_knob_settings = {
     label: 'SIN',
     min_val: 0,
@@ -134,13 +132,6 @@ lissa.controls.oscillator = function($container, oscillators) {
     default_val: 100,
     id: get_id('highcut-knob'),
   };
-  var offsetcut_knob_settings = {
-    label: 'CUT OFFSET',
-    min_val: 0,
-    max_val: 100,
-    default_val: 0,
-    id: get_id('offsetcut-knob'),
-  };
   var offset_knob_settings = {
     label: 'OFFSET',
     min_val: 0,
@@ -151,76 +142,47 @@ lissa.controls.oscillator = function($container, oscillators) {
   var freq_knob_settings = {
     label: 'FREQ',
     min_val: 1,
-    max_val: 500,
+    max_val: 5000,
     default_val: 200,
     id: get_id('freq-knob'),
   };
-
-  function setFreq() {
-    // setTimeout makes sure all knobs have updated before reading their value
-    setTimeout(function() {
-      var freq = freq_knob.getVal() * (1.0 * multiply_knob.getVal() / divide_knob.getVal()) * Math.pow(2, detune_knob.getVal() / 12000.0);
-      selected_oscillator_.setFreq(freq);
-    }, 0);
-  }
 
   // $container.attr('id') is used to prefix the ids of the knobs
   function get_id(s) {
     return $container.attr('id') + '-' + s;
   }
 
+  function wave_amp_setter(type, max) {
+    return function(val) {
+      selected_oscillator_.setAmp(type, val / max);
+    };
+  }
+
   function render() {
     var $el = lissa.templates.templates.oscillator();
     $container.append($el);
-    updateOscillator(1);
 
     var $col1 = $container.find('.knob-column.col-1').first();
     var $col2 = $container.find('.knob-column.col-2').first();
     var $col3 = $container.find('.knob-column.col-3').first();
 
-    multiply_knob = lissa.controls.knob($col1, setFreq, multiply_knob_settings);
+    freq_knob = lissa.controls.knob($col1,
+      function(val) {
+        selected_oscillator_.setFreq(val);
+      }, freq_knob_settings);
+    freq_knob.render();
+
+    multiply_knob = lissa.controls.knob($col2,
+      function(val) {
+        selected_oscillator_.setMultiple(val);
+      }, multiply_knob_settings);
     multiply_knob.render();
 
-    divide_knob = lissa.controls.knob($col1, setFreq, divide_knob_settings);
+    divide_knob = lissa.controls.knob($col3,
+      function(val) {
+        selected_oscillator_.setDivisor(val);
+      }, divide_knob_settings);
     divide_knob.render();
-
-    detune_knob = lissa.controls.knob($col2, setFreq, detune_knob_settings);
-    detune_knob.render();
-
-    phase_knob = lissa.controls.knob($col2,
-      function(val) {
-        selected_oscillator_.setPhase(val / 360);
-      }, 
-      phase_knob_settings);
-    phase_knob.render();
-
-    function wave_amp_setter(type, max) {
-      return function(val) {
-        selected_oscillator_.setAmp(type, val / max);
-      };
-    }
-
-    sin_knob = lissa.controls.knob($col3,
-        wave_amp_setter('sin', sin_knob_settings.max_val), sin_knob_settings);
-    sin_knob.render();
-
-    tri_knob = lissa.controls.knob($col3,
-        wave_amp_setter('tri', tri_knob_settings.max_val), tri_knob_settings);
-    tri_knob.render();
-
-    sqr_knob = lissa.controls.knob($col1,
-        wave_amp_setter('sqr', sqr_knob_settings.max_val), sqr_knob_settings);
-    sqr_knob.render();
-
-    saw_knob = lissa.controls.knob($col2,
-        wave_amp_setter('saw', saw_knob_settings.max_val), saw_knob_settings);
-    saw_knob.render();
-
-    offset_knob = lissa.controls.knob($col3,
-      function(val) {
-        selected_oscillator_.setOffset(val / 100);
-      }, offset_knob_settings);
-    offset_knob.render();
 
     lowcut_knob = lissa.controls.knob($col1,
       function(val) {
@@ -234,15 +196,42 @@ lissa.controls.oscillator = function($container, oscillators) {
       }, highcut_knob_settings);
     highcut_knob.render();
 
-    offsetcut_knob = lissa.controls.knob($col3,
+    offset_knob = lissa.controls.knob($col3,
       function(val) {
-        selected_oscillator_.setOffsetCut(val / 100);
-      }, offsetcut_knob_settings);
-    offsetcut_knob.render();
+        selected_oscillator_.setOffset(val / 100);
+      }, offset_knob_settings);
+    offset_knob.render();
 
-    freq_knob = lissa.controls.knob($col1, setFreq, freq_knob_settings);
-    freq_knob.render();
+    sin_knob = lissa.controls.knob($col1,
+        wave_amp_setter('sin', sin_knob_settings.max_val), sin_knob_settings);
+    sin_knob.render();
 
+    tri_knob = lissa.controls.knob($col2,
+        wave_amp_setter('tri', tri_knob_settings.max_val), tri_knob_settings);
+    tri_knob.render();
+
+    sqr_knob = lissa.controls.knob($col3,
+        wave_amp_setter('sqr', sqr_knob_settings.max_val), sqr_knob_settings);
+    sqr_knob.render();
+
+    saw_knob = lissa.controls.knob($col1,
+        wave_amp_setter('saw', saw_knob_settings.max_val), saw_knob_settings);
+    saw_knob.render();
+
+    phase_knob = lissa.controls.knob($col2,
+      function(val) {
+        selected_oscillator_.setPhase(val / 360);
+      }, 
+      phase_knob_settings);
+    phase_knob.render();
+
+    detune_knob = lissa.controls.knob($col3,
+      function(val) {
+        selected_oscillator_.setDetune(Math.pow(2, val / 12000.0));
+      }, detune_knob_settings);
+    detune_knob.render();
+
+    updateOscillator(1);
   }
 
   function onOscillatorChange(event){
@@ -280,8 +269,19 @@ lissa.controls.oscillator = function($container, oscillators) {
     updateKnobs();
   }
 
-  function updateKnobs(){
-
+  function updateKnobs(){    
+    freq_knob.setVal(selected_oscillator_.getFreq());
+    multiply_knob.setVal(selected_oscillator_.getMultiple());
+    divide_knob.setVal(selected_oscillator_.getDivisor());
+    lowcut_knob.setVal(selected_oscillator_.getLowCut()*100);
+    highcut_knob.setVal(selected_oscillator_.getHighCut()*100);
+    offset_knob.setVal(selected_oscillator_.getOffset()*100);
+    sin_knob.setVal(selected_oscillator_.getAmp('sin')*sin_knob_settings.max_val);
+    tri_knob.setVal(selected_oscillator_.getAmp('tri')*tri_knob_settings.max_val);
+    sqr_knob.setVal(selected_oscillator_.getAmp('sqr')*sqr_knob_settings.max_val);
+    saw_knob.setVal(selected_oscillator_.getAmp('saw')*saw_knob_settings.max_val);
+    phase_knob.setVal(selected_oscillator_.getPhase()*360);
+    detune_knob.setVal(Math.log(selected_oscillator_.getDetune()) / Math.log(2) * 12000);
   }
 
   function updateTitle(){
@@ -316,7 +316,6 @@ lissa.controls.oscillator = function($container, oscillators) {
   return {
     render: render,
     randomize: randomize,
-    setFreq: setFreq,
     onChannelChange: onChannelChange,
     onOperationChange: onOperationChange,
     onOscillatorChange: onOscillatorChange
@@ -359,74 +358,22 @@ lissa.controls.minicolors = function($container) {
   };
 };
 
-lissa.controls.randomizer = function($container, items) {
-  console.log($container);
-  var $randomize_button = $container.find('.randomize').first();
-  var $play_button = $container.find('.play').first();
-  var $controls_button = $container.find('.controls-toggle').first();
-  var $manipulators_button = $container.find('.manipulators-toggle').first();
-  var manipulators_shown = false;
-  var controls_shown = false;
-
-  if (!controls_shown)
-    $('.controls').hide();
-
-  if (!manipulators_shown)
-    $('.manipulators').hide();
-
-  function init() {
-    $randomize_button.on('click', randomize);
-    $controls_button.on('click', toggleControls);
-    $manipulators_button.on('click', toggleManipulators);
-  }
-
-  function randomize() {
-    _.each(items, function(item) {
-      item.randomize();
-    });
-  }
-
-  function toggleControls() {
-    controls_shown = !controls_shown;
-    if (controls_shown) {
-      $('.controls').fadeTo(500, 0.75);
-      $controls_button.text('Hide');
-    }
-    else {
-      $('.controls').fadeOut(500);
-      $controls_button.text('Controls');
-    }
-  }
-
-  function toggleManipulators() {
-    manipulators_shown = !manipulators_shown;
-    if (manipulators_shown) {
-      $('.manipulators').fadeTo(500, 0.75);
-      $manipulators_button.text('Hide');
-    }
-    else {
-      $('.manipulators').fadeOut(500);
-      $manipulators_button.text('Manipulators');
-    }
-  }
-
-  return {
-    init: init,
-  };
-};
-
 lissa.controls.init = function($container) {
+  var controls_shown = false;
   var oscillator_controls = lissa.controls.oscillator(
     $container.find('#oscillator-controls').first(),
     lissa.synth.oscillators
   );
   oscillator_controls.render();
-
+  if (!controls_shown)
+    $('.controls').hide();
+  var $controls_button = $container.find('.controls-toggle').first();
   var $plus_button = $container.find('.op-plus').first();
   var $subtract_button = $container.find('.op-subtract').first();
   var $multiply_button = $container.find('.op-multiply').first();
   var $divide_button = $container.find('.op-divide').first();
-  
+
+  $controls_button.on('click', toggleControls);
   $plus_button.on('click', {operation: '+'}, oscillator_controls.onOperationChange);
   $subtract_button.on('click', {operation: '-'}, oscillator_controls.onOperationChange);
   $multiply_button.on('click', {operation: '*'}, oscillator_controls.onOperationChange);
@@ -448,8 +395,17 @@ lissa.controls.init = function($container) {
   var minicolors = lissa.controls.minicolors($('.minicolors'));
   minicolors.init();
 
-  var randomizer = lissa.controls.randomizer($container, [oscillator_controls, minicolors]);
-  randomizer.init();
+  function toggleControls() {
+    controls_shown = !controls_shown;
+    if (controls_shown) {
+      $('.controls').fadeTo(150, 0.75);
+      $controls_button.text('Hide');
+    }
+    else {
+      $('.controls').fadeOut(150);
+      $controls_button.text('Controls');
+    }
+  }
 
 };
 

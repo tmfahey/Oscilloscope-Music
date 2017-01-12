@@ -89,6 +89,9 @@ lissa.oscillator = function() {
   var amps_ = {};
   var current_phase_ = 0.0;
   var frequency_ = lissa.smoothValue(0.0, FREQ_DECAY);
+  var multiple_ = lissa.smoothValue(1.0);
+  var divisor_ = lissa.smoothValue(1.0);
+  var detune_ = lissa.smoothValue(Math.pow(2, 0 / 12000.0));
   var phase_offset_ = lissa.smoothValue(0.0, PHASE_DECAY);
   var channel_state_ = [false, false];
   var operator_ = '+';
@@ -104,9 +107,17 @@ lissa.oscillator = function() {
     offset = offset_.get();
     phase_offset = phase_offset_.get();
     frequency = frequency_.get();
-    current_phase_ += frequency / sample_rate;
-    if (current_phase_ > 1.0){
-      current_phase_ -= 1.0;
+    multiple = multiple_.get();
+    divisor = divisor_.get();
+    detune = detune_.get();
+    cut_frequency_effect = high_cut - low_cut;
+    if(cut_frequency_effect<0){
+      cut_frequency_effect = 0;
+    }
+    effective_frequency = frequency * multiple / divisor * detune * cut_frequency_effect;
+    current_phase_ += effective_frequency / sample_rate;
+    if (current_phase_ > high_cut){
+      current_phase_ -= cut_frequency_effect;
     }
 
     var val = offset;
@@ -164,6 +175,9 @@ lissa.oscillator = function() {
   return {
     tick: tick,
     setFreq: frequency_.set,
+    setMultiple: multiple_.set,
+    setDivisor: divisor_.set,
+    setDetune: detune_.set,
     setPhase: phase_offset_.set,
     setAmp: setAmp,
     setSampleRate: setSampleRate,
@@ -174,6 +188,9 @@ lissa.oscillator = function() {
     setChannels: setChannels,
     setOperator: setOperator,
     getFreq: frequency_.get,
+    getMultiple: multiple_.get,
+    getDivisor: divisor_.get,
+    getDetune: detune_.get,
     getPhase: phase_offset_.get,
     getAmp: getAmp,
     getLowCut: low_cut_.get,
